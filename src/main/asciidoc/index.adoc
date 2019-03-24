@@ -1,0 +1,39 @@
+= DHIS2 Meta Cache REST Api documentation
+
+This is documentation for the dhis2 meta cache service running at http://localhost:8080:
+
+== List all data elements
+
+.request
+include::{snippets}/list-dataElements/http-request.adoc[]
+
+.response
+include::{snippets}/list-dataElements/http-response.adoc[]
+
+== Find one data element by ID
+
+.request
+include::{snippets}/find-dataElement/http-request.adoc[]
+
+.response
+include::{snippets}/find-dataElement/http-response.adoc[]
+
+== List all data element groups
+
+.request
+include::{snippets}/list-dataElementGroups/http-request.adoc[]
+
+.response
+include::{snippets}/list-dataElementGroups/http-response.adoc[]
+
+== Find one data element group by ID
+
+.request
+include::{snippets}/find-dataElementGroup/http-request.adoc[]
+
+.response
+include::{snippets}/find-dataElementGroup/http-response.adoc[]
+
+
+This is a rudimentary documentation.
+PRs welcome!

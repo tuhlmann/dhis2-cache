@@ -16,14 +16,15 @@ class DataElementGroupController {
     this.repository = repository;
   }
 
-  @GetMapping("/dataElementGroups")
+  @GetMapping(path = "/dataElementGroups")
   Iterable<DataElementGroup> all() {
     return repository.findAll();
   }
 
-  @GetMapping("/dataElementGroups/{id}")
-  DataElementGroup one(@PathVariable String id) {
-
+  @GetMapping(path = "/dataElementGroups/{id}")
+  DataElementGroup one(
+    @PathVariable String id
+  ) {
     return repository.findByGroupId(id)
       .orElseThrow(() -> new DataElementGroupNotFoundException(id));
   }
