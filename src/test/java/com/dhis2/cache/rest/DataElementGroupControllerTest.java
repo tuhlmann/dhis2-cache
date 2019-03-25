@@ -1,4 +1,4 @@
-package com.dhis2.metaCache.rest;
+package com.dhis2.cache.rest;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
@@ -28,8 +28,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.dhis2.metaCache.DataElementGroupRepository;
-import com.dhis2.metaCache.data.DataElementGroup;
+import com.dhis2.cache.DataElementGroupRepository;
+import com.dhis2.cache.data.DataElementGroup;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -75,6 +75,19 @@ public class DataElementGroupControllerTest {
       .andDo(document("list-dataElementGroups"));
   }
 
+  @WithMockUser
+  @Test
+  public void list_xml_login_ok() throws Exception {
+    
+    mockMvc
+    .perform(get(String.format("/dataElementGroups.xml", GROUP_ID)))
+    .andDo(print())
+    .andExpect(content().contentType("application/xml;charset=UTF-8"))
+    .andExpect(status().isOk())
+    .andExpect(xpath("DataElementGroup").nodeCount(2))
+    .andDo(document("list-dataElementGroups"));
+  }
+  
   @WithMockUser
   @Test
   public void find_json_login_ok() throws Exception {
@@ -129,6 +142,24 @@ public class DataElementGroupControllerTest {
     mockMvc
     .perform(get(String.format("/dataElementGroups/%s", GROUP_ID))
     .header("Accept", "application/xml"))
+    .andDo(print())
+    .andExpect(content().contentType("application/xml;charset=UTF-8"))
+    .andExpect(status().isOk())
+    .andExpect(xpath("DataElementGroup/id").string(is(GROUP_ID)))
+    .andExpect(xpath("DataElementGroup/displayName").string(is(DISPLAY_NAME)))
+    .andExpect(xpath("DataElementGroup/members/members").nodeCount(3))
+    .andExpect(xpath("DataElementGroup/members/members[1]").string(is("element1")))
+    .andExpect(xpath("DataElementGroup/members/members[2]").string(is("element2")))
+    .andExpect(xpath("DataElementGroup/members/members[3]").string(is("element3")))
+    .andDo(document("find-dataElementGroup"));
+  }
+  
+  @WithMockUser
+  @Test
+  public void find_xml2_login_ok() throws Exception {
+    
+    mockMvc
+    .perform(get(String.format("/dataElementGroups/%s.xml", GROUP_ID)))
     .andDo(print())
     .andExpect(content().contentType("application/xml;charset=UTF-8"))
     .andExpect(status().isOk())

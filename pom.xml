@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.dhis2</groupId>
-	<artifactId>metaCache</artifactId>
+	<artifactId>cache</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>metaCache</name>
+	<name>dhis2Cache</name>
 	<description>Demo DHIS2 REST Service fetching and caching dhis2 meta data</description>
 
 	<properties>
@@ -19,7 +19,7 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
+		<dependency> <!-- remove -->
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
@@ -35,8 +35,19 @@
 		  <groupId>com.fasterxml.jackson.dataformat</groupId>
 		  <artifactId>jackson-dataformat-xml</artifactId>
 		</dependency>
-		
+
+        <!-- 
 		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+		
+		<dependency> <!-- remove -->
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
@@ -71,6 +82,7 @@
 			<plugin>
 			    <groupId>org.asciidoctor</groupId>
 			    <artifactId>asciidoctor-maven-plugin</artifactId>
+			    <version>1.5.6</version>
 			    <executions>
 			        <execution>
 			            <id>generate-docs</id>

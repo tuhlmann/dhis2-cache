@@ -1,4 +1,4 @@
-package com.dhis2.metaCache;
+package com.dhis2.cache;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

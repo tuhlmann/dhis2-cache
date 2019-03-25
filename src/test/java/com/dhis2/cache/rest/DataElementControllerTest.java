@@ -1,4 +1,4 @@
-package com.dhis2.metaCache.rest;
+package com.dhis2.cache.rest;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
@@ -28,8 +28,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.dhis2.metaCache.DataElementRepository;
-import com.dhis2.metaCache.data.DataElement;
+import com.dhis2.cache.DataElementRepository;
+import com.dhis2.cache.data.DataElement;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

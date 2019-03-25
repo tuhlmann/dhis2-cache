@@ -1,4 +1,4 @@
-package com.dhis2.metaCache.data;
+package com.dhis2.cache.data;
 
 import java.util.List;
 
@@ -15,6 +15,9 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,17 +28,20 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@JacksonXmlRootElement(localName = "DataElementGroup")
 public class DataElementGroup {
 
   private @Id @GeneratedValue Long id;
 
-  @Column
   private String groupId;
   
-  @Column
+  @JsonProperty("name")
+  @JacksonXmlProperty(localName = "name")  
   private String displayName;
   
   @ElementCollection
+  @JacksonXmlProperty(localName = "member")
+  @JacksonXmlElementWrapper(localName = "members")
   private List<String> members;
 
   @JsonProperty("id")

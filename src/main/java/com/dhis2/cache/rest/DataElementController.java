@@ -1,13 +1,12 @@
-package com.dhis2.metaCache.rest;
+package com.dhis2.cache.rest;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dhis2.metaCache.DataElementGroupRepository;
-import com.dhis2.metaCache.DataElementRepository;
-import com.dhis2.metaCache.data.DataElement;
-import com.dhis2.metaCache.data.DataElementGroup;
+import com.dhis2.cache.DataElementRepository;
+import com.dhis2.cache.data.DataElement;
+import com.dhis2.cache.data.DataElements;
 
 @RestController
 class DataElementController {
@@ -19,8 +18,10 @@ class DataElementController {
   }
 
   @GetMapping("/dataElements")
-  Iterable<DataElement> all() {
-    return repository.findAll();
+  DataElements<DataElement> all() {
+    DataElements<DataElement> elements = new DataElements<>();
+    repository.findAll().iterator().forEachRemaining(elements::add);
+    return elements;
   }
 
   @GetMapping("/dataElements/{id}")

@@ -1,4 +1,4 @@
-package com.dhis2.metaCache;
+package com.dhis2.cache;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,10 +6,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-public class MetaCacheApplication {
+public class Dhis2CacheApplication {
 
 	public static void main(String... args) {
-		SpringApplication.run(MetaCacheApplication.class, args);
+		SpringApplication.run(Dhis2CacheApplication.class, args);
 	}
 
 }

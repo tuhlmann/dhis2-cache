@@ -1,4 +1,4 @@
-package com.dhis2.metaCache;
+package com.dhis2.cache;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -10,9 +10,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import com.dhis2.metaCache.data.DataElementService;
-import com.dhis2.metaCache.json.DataElementGroups;
-import com.dhis2.metaCache.json.DataElements;
+import com.dhis2.cache.data.DataElementService;
+import com.dhis2.cache.json.DataElementGroups;
+import com.dhis2.cache.json.DataElements;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,12 +31,15 @@ public class MetaFetcher {
 
   @Autowired
   private DataElementRepository elementRepository;
+  
+  private final Dhis2CacheManager cacheManager;
 
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
   private final RestTemplate restTemplate = new RestTemplate();
   
-  MetaFetcher() {
-    restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "district"));
+  MetaFetcher(Dhis2CacheManager cacheManager) {
+    this.cacheManager = cacheManager;
+    restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "district"));    
   }
 
   private String getDataElementGroupsUrl(String host) {
@@ -49,15 +52,17 @@ public class MetaFetcher {
   
   // TODO: add a transaction
   private void storeDataElementGroups(DataElementGroups dataElementGroups) {
-    elementGroupRepository.deleteAll();
+//    elementGroupRepository.deleteAll();    
+//    elementGroupRepository.saveAll(dataElementService.genDataElementGroups(dataElementGroups));
     
-    elementGroupRepository.saveAll(dataElementService.genDataElementGroups(dataElementGroups));
+    groups = dataElementService.genDataElementGroups(dataElementGroups);
+    cacheManager.getGroupCache().invalidateAll();
+    cacheManager.getGroupCache().putAll(dataElementGroups.getAsMap());
   }
   
   // TODO: add a transaction
   private void storeDataElements(DataElements dataElements) {
     elementRepository.deleteAll();
-    
     elementRepository.saveAll(dataElementService.genDataElements(dataElements));
   }
   

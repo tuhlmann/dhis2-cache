@@ -1,4 +1,4 @@
-package com.dhis2.metaCache.rest;
+package com.dhis2.cache.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

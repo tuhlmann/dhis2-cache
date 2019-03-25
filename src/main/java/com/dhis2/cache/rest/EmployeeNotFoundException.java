@@ -1,4 +1,4 @@
-package com.dhis2.metaCache.rest;
+package com.dhis2.cache.rest;
 
 public class EmployeeNotFoundException extends RuntimeException {
 

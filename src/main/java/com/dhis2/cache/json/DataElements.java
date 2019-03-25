@@ -1,4 +1,4 @@
-package com.dhis2.metaCache.json;
+package com.dhis2.cache.json;
 
 import java.util.List;
 
@@ -12,11 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class DataElement {
+public class DataElements {
+  
+  private List<DataElement> dataElements;
 
-  private String id;
-  private String displayName;
-
-  private List<WrappedElementId> dataElementGroups;
-    
 }

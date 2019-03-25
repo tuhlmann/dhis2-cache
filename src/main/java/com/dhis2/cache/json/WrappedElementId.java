@@ -1,6 +1,4 @@
-package com.dhis2.metaCache.json;
-
-import java.util.List;
+package com.dhis2.cache.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -12,8 +10,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class DataElements {
-  
-  private List<DataElement> dataElements;
+public class WrappedElementId {
 
+  private String id;
+    
 }

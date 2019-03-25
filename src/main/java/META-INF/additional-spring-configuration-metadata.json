@@ -1,0 +1,22 @@
+{"properties": [
+  {
+    "name": "metaFetcher.fetchEachMs",
+    "type": "int",
+    "description": "'metaFetcher.fetchEachMs' - refetch the meta data after this many milli seconds"
+  },
+  {
+    "name": "dhis2.url",
+    "type": "java.lang.String",
+    "description": "'dhis2.url' - The URL to fetch meta data from"
+  },
+  {
+    "name": "dhis2.password",
+    "type": "java.lang.String",
+    "description": "'dhis2.password' - password to access the backend service"
+  },
+  {
+    "name": "dhis2.username",
+    "type": "java.lang.String",
+    "description": "'dhis2.username' - username that is allowed to access the backend service"
+  }
+]}
