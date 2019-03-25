@@ -28,7 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.dhis2.cache.DataElementGroupRepository;
+import com.dhis2.cache.Dhis2ElementGroupCache;
 import com.dhis2.cache.data.DataElementGroup;
 
 @RunWith(SpringRunner.class)
@@ -42,7 +42,7 @@ public class DataElementGroupControllerTest {
   private MockMvc mockMvc;
 
   @MockBean
-  private DataElementGroupRepository mockRepository;
+  private Dhis2ElementGroupCache mockCache;
 
   private final static String GROUP_ID = "myGroupId1";
   private final static String DISPLAY_NAME = "A sample group";
@@ -53,13 +53,14 @@ public class DataElementGroupControllerTest {
     group1.setDisplayName(DISPLAY_NAME);
     group1.setGroupId(GROUP_ID);
     group1.setMembers(Arrays.asList("element1", "element2", "element3"));
-    when(mockRepository.findByGroupId(GROUP_ID)).thenReturn(Optional.of(group1));
+    when(mockCache.findById(GROUP_ID)).thenReturn(Optional.of(group1));
 
     DataElementGroup group2 = new DataElementGroup();
     group2.setDisplayName("A second group");
     group2.setGroupId("myGroupId2");
     group2.setMembers(Arrays.asList("elementA", "elementB", "elementC"));
-    when(mockRepository.findAll()).thenReturn(Arrays.asList(group1, group2));
+
+    when(mockCache.all()).thenReturn(Arrays.asList(group1, group2));
   }
 
   // Expect a username=user and password=password user to be able to access the endpoint
@@ -72,7 +73,7 @@ public class DataElementGroupControllerTest {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$", hasSize(2)))
-      .andDo(document("list-dataElementGroups"));
+      .andDo(document("list-dataElementGroups.json"));
   }
 
   @WithMockUser
@@ -84,8 +85,9 @@ public class DataElementGroupControllerTest {
     .andDo(print())
     .andExpect(content().contentType("application/xml;charset=UTF-8"))
     .andExpect(status().isOk())
-    .andExpect(xpath("DataElementGroup").nodeCount(2))
-    .andDo(document("list-dataElementGroups"));
+    .andExpect(xpath("DataElementGroups").nodeCount(1))
+    .andExpect(xpath("DataElementGroups/item").nodeCount(2))
+    .andDo(document("list-dataElementGroups.xml"));
   }
   
   @WithMockUser
@@ -97,10 +99,10 @@ public class DataElementGroupControllerTest {
     .andDo(print())
     .andExpect(status().isOk())
     .andExpect(jsonPath("$.id", is(GROUP_ID)))
-    .andExpect(jsonPath("$.displayName", is(DISPLAY_NAME)))
+    .andExpect(jsonPath("$.name", is(DISPLAY_NAME)))
     .andExpect(jsonPath("$.members", hasSize(3)))
     .andExpect(jsonPath("$.members", contains("element1", "element2", "element3")))
-    .andDo(document("find-dataElementGroup"));
+    .andDo(document("find-dataElementGroup.json"));
   }
   
   @WithMockUser
@@ -113,10 +115,10 @@ public class DataElementGroupControllerTest {
     .andDo(print())
     .andExpect(status().isOk())
     .andExpect(jsonPath("$.id", is(GROUP_ID)))
-    .andExpect(jsonPath("$.displayName", is(DISPLAY_NAME)))
+    .andExpect(jsonPath("$.name", is(DISPLAY_NAME)))
     .andExpect(jsonPath("$.members", hasSize(3)))
     .andExpect(jsonPath("$.members", contains("element1", "element2", "element3")))
-    .andDo(document("find-dataElementGroup"));
+    .andDo(document("find-dataElementGroup.json"));
   }
   
   @WithMockUser
@@ -129,10 +131,10 @@ public class DataElementGroupControllerTest {
     .andDo(print())
     .andExpect(status().isOk())
     .andExpect(jsonPath("$.id", is(GROUP_ID)))
-    .andExpect(jsonPath("$.displayName", is(DISPLAY_NAME)))
+    .andExpect(jsonPath("$.name", is(DISPLAY_NAME)))
     .andExpect(jsonPath("$.members", hasSize(3)))
     .andExpect(jsonPath("$.members", contains("element1", "element2", "element3")))
-    .andDo(document("find-dataElementGroup"));
+    .andDo(document("find-dataElementGroup.json"));
   }  
 
   @WithMockUser
@@ -146,12 +148,12 @@ public class DataElementGroupControllerTest {
     .andExpect(content().contentType("application/xml;charset=UTF-8"))
     .andExpect(status().isOk())
     .andExpect(xpath("DataElementGroup/id").string(is(GROUP_ID)))
-    .andExpect(xpath("DataElementGroup/displayName").string(is(DISPLAY_NAME)))
-    .andExpect(xpath("DataElementGroup/members/members").nodeCount(3))
-    .andExpect(xpath("DataElementGroup/members/members[1]").string(is("element1")))
-    .andExpect(xpath("DataElementGroup/members/members[2]").string(is("element2")))
-    .andExpect(xpath("DataElementGroup/members/members[3]").string(is("element3")))
-    .andDo(document("find-dataElementGroup"));
+    .andExpect(xpath("DataElementGroup/name").string(is(DISPLAY_NAME)))
+    .andExpect(xpath("DataElementGroup/members/member").nodeCount(3))
+    .andExpect(xpath("DataElementGroup/members/member[1]").string(is("element1")))
+    .andExpect(xpath("DataElementGroup/members/member[2]").string(is("element2")))
+    .andExpect(xpath("DataElementGroup/members/member[3]").string(is("element3")))
+    .andDo(document("find-dataElementGroup.xml"));
   }
   
   @WithMockUser
@@ -164,12 +166,30 @@ public class DataElementGroupControllerTest {
     .andExpect(content().contentType("application/xml;charset=UTF-8"))
     .andExpect(status().isOk())
     .andExpect(xpath("DataElementGroup/id").string(is(GROUP_ID)))
-    .andExpect(xpath("DataElementGroup/displayName").string(is(DISPLAY_NAME)))
-    .andExpect(xpath("DataElementGroup/members/members").nodeCount(3))
-    .andExpect(xpath("DataElementGroup/members/members[1]").string(is("element1")))
-    .andExpect(xpath("DataElementGroup/members/members[2]").string(is("element2")))
-    .andExpect(xpath("DataElementGroup/members/members[3]").string(is("element3")))
-    .andDo(document("find-dataElementGroup"));
+    .andExpect(xpath("DataElementGroup/name").string(is(DISPLAY_NAME)))
+    .andExpect(xpath("DataElementGroup/members/member").nodeCount(3))
+    .andExpect(xpath("DataElementGroup/members/member[1]").string(is("element1")))
+    .andExpect(xpath("DataElementGroup/members/member[2]").string(is("element2")))
+    .andExpect(xpath("DataElementGroup/members/member[3]").string(is("element3")))
+    .andDo(document("find-dataElementGroup.xml"));
+  }
+  
+  @WithMockUser
+  @Test
+  public void find_xml3_login_ok() throws Exception {
+    
+    mockMvc
+    .perform(get(String.format("/dataElementGroups/%s?mediaType=xml", GROUP_ID)))
+    .andDo(print())
+    .andExpect(content().contentType("application/xml;charset=UTF-8"))
+    .andExpect(status().isOk())
+    .andExpect(xpath("DataElementGroup/id").string(is(GROUP_ID)))
+    .andExpect(xpath("DataElementGroup/name").string(is(DISPLAY_NAME)))
+    .andExpect(xpath("DataElementGroup/members/member").nodeCount(3))
+    .andExpect(xpath("DataElementGroup/members/member[1]").string(is("element1")))
+    .andExpect(xpath("DataElementGroup/members/member[2]").string(is("element2")))
+    .andExpect(xpath("DataElementGroup/members/member[3]").string(is("element3")))
+    .andDo(document("find-dataElementGroup.xml"));
   }
   
   @Test

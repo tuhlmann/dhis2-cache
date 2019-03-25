@@ -4,31 +4,30 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dhis2.cache.DataElementRepository;
+import com.dhis2.cache.Dhis2ElementCache;
 import com.dhis2.cache.data.DataElement;
 import com.dhis2.cache.data.DataElements;
 
 @RestController
 class DataElementController {
 
-  private final DataElementRepository repository;
+  private final Dhis2ElementCache elementCache;
 
-  DataElementController(DataElementRepository repository) {
-    this.repository = repository;
+  DataElementController(Dhis2ElementCache elementCache) {
+    this.elementCache = elementCache;
   }
 
   @GetMapping("/dataElements")
   DataElements<DataElement> all() {
-    DataElements<DataElement> elements = new DataElements<>();
-    repository.findAll().iterator().forEachRemaining(elements::add);
-    return elements;
+    return new DataElements<DataElement>(elementCache.all());
   }
 
   @GetMapping("/dataElements/{id}")
   DataElement one(@PathVariable String id) {
-
-    return repository.findByElementId(id)
-      .orElseThrow(() -> new DataElementNotFoundException(id));
+    return elementCache
+        .findById(id)
+        .orElseThrow(() -> new DataElementNotFoundException(id));
   }
+  
 
 }

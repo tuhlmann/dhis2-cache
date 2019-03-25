@@ -24,21 +24,17 @@ public class MetaFetcher {
   private Environment env;
   
   @Autowired
-  private DataElementGroupRepository elementGroupRepository;
-  
-  @Autowired
   private DataElementService dataElementService;
 
-  @Autowired
-  private DataElementRepository elementRepository;
-  
-  private final Dhis2CacheManager cacheManager;
+  private final Dhis2ElementGroupCache groupCache;
+  private final Dhis2ElementCache elementCache;
 
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
   private final RestTemplate restTemplate = new RestTemplate();
   
-  MetaFetcher(Dhis2CacheManager cacheManager) {
-    this.cacheManager = cacheManager;
+  MetaFetcher(Dhis2ElementGroupCache groupCache, Dhis2ElementCache elementCache) {
+    this.groupCache = groupCache;
+    this.elementCache = elementCache;
     restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "district"));    
   }
 
@@ -50,20 +46,14 @@ public class MetaFetcher {
     return String.format("%s/api/29/dataElements.json?paging=false&fields=id,displayName,dataElementGroups", host);
   }
   
-  // TODO: add a transaction
   private void storeDataElementGroups(DataElementGroups dataElementGroups) {
-//    elementGroupRepository.deleteAll();    
-//    elementGroupRepository.saveAll(dataElementService.genDataElementGroups(dataElementGroups));
-    
-    groups = dataElementService.genDataElementGroups(dataElementGroups);
-    cacheManager.getGroupCache().invalidateAll();
-    cacheManager.getGroupCache().putAll(dataElementGroups.getAsMap());
+    groupCache.clear();
+    groupCache.putAll(dataElementService.genDataElementGroups(dataElementGroups));
   }
   
-  // TODO: add a transaction
   private void storeDataElements(DataElements dataElements) {
-    elementRepository.deleteAll();
-    elementRepository.saveAll(dataElementService.genDataElements(dataElements));
+    elementCache.clear();
+    elementCache.putAll(dataElementService.genDataElements(dataElements));
   }
   
   @Scheduled(fixedDelayString = "${metaFetcher.fetchEachMs}", initialDelay = 2000)

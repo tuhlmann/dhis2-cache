@@ -14,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +30,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.dhis2.cache.DataElementRepository;
+import com.dhis2.cache.Dhis2ElementCache;
 import com.dhis2.cache.data.DataElement;
 
 @RunWith(SpringRunner.class)
@@ -42,7 +44,7 @@ public class DataElementControllerTest {
   private MockMvc mockMvc;
 
   @MockBean
-  private DataElementRepository mockRepository;
+  private Dhis2ElementCache mockCache;
   
   private final static String ELEMENT_ID = "myElementId1";
   private final static String DISPLAY_NAME = "A sample element";
@@ -53,14 +55,13 @@ public class DataElementControllerTest {
     element1.setDisplayName(DISPLAY_NAME);
     element1.setElementId(ELEMENT_ID);
     element1.setGroups(Arrays.asList("group1", "group2", "group3"));
-    when(mockRepository.findByElementId(ELEMENT_ID)).thenReturn(Optional.of(element1));
+    when(mockCache.findById(ELEMENT_ID)).thenReturn(Optional.of(element1));
     
     DataElement element2 = new DataElement();
     element2.setDisplayName("A second element");
     element2.setElementId("myElementId2");
-    element2.setGroups(Arrays.asList("groupA", "groupB", "groupC"));
-    when(mockRepository.findAll()).thenReturn(Arrays.asList(element1, element2));
-    
+    element2.setGroups(Arrays.asList("groupA", "groupB", "groupC"));    
+    when(mockCache.all()).thenReturn(Arrays.asList(element1, element2));
   }
 
   // Expect a username=user and password=password user to be able to access the endpoint
@@ -73,8 +74,22 @@ public class DataElementControllerTest {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$", hasSize(2)))
-      .andDo(document("list-dataElements"));
+      .andDo(document("list-dataElements.json"));
   }
+  
+  @WithMockUser
+  @Test
+  public void list_xml_login_ok() throws Exception {
+    
+    mockMvc
+    .perform(get(String.format("/dataElements.xml", ELEMENT_ID)))
+    .andDo(print())
+    .andExpect(content().contentType("application/xml;charset=UTF-8"))
+    .andExpect(status().isOk())
+    .andExpect(xpath("DataElements").nodeCount(1))
+    .andExpect(xpath("DataElements/item").nodeCount(2))
+    .andDo(document("list-dataElements.xml"));
+  }  
   
   @WithMockUser
   @Test
@@ -85,10 +100,10 @@ public class DataElementControllerTest {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id", is(ELEMENT_ID)))
-      .andExpect(jsonPath("$.displayName", is(DISPLAY_NAME)))
+      .andExpect(jsonPath("$.name", is(DISPLAY_NAME)))
       .andExpect(jsonPath("$.groups", hasSize(3)))
       .andExpect(jsonPath("$.groups", contains("group1", "group2", "group3")))
-      .andDo(document("find-dataElement"));
+      .andDo(document("find-dataElement.json"));
   }
 
   @WithMockUser
@@ -101,10 +116,10 @@ public class DataElementControllerTest {
     .andDo(print())
     .andExpect(status().isOk())
     .andExpect(jsonPath("$.id", is(ELEMENT_ID)))
-    .andExpect(jsonPath("$.displayName", is(DISPLAY_NAME)))
+    .andExpect(jsonPath("$.name", is(DISPLAY_NAME)))
     .andExpect(jsonPath("$.groups", hasSize(3)))
     .andExpect(jsonPath("$.groups", contains("group1", "group2", "group3")))
-    .andDo(document("find-dataElement"));
+    .andDo(document("find-dataElement.json"));
   }
   
   @WithMockUser
@@ -117,10 +132,10 @@ public class DataElementControllerTest {
     .andDo(print())
     .andExpect(status().isOk())
     .andExpect(jsonPath("$.id", is(ELEMENT_ID)))
-    .andExpect(jsonPath("$.displayName", is(DISPLAY_NAME)))
+    .andExpect(jsonPath("$.name", is(DISPLAY_NAME)))
     .andExpect(jsonPath("$.groups", hasSize(3)))
     .andExpect(jsonPath("$.groups", contains("group1", "group2", "group3")))
-    .andDo(document("find-dataElement"));
+    .andDo(document("find-dataElement.json"));
   }  
 
   @WithMockUser
@@ -134,12 +149,48 @@ public class DataElementControllerTest {
     .andExpect(content().contentType("application/xml;charset=UTF-8"))
     .andExpect(status().isOk())
     .andExpect(xpath("DataElement/id").string(is(ELEMENT_ID)))
-    .andExpect(xpath("DataElement/displayName").string(is(DISPLAY_NAME)))
-    .andExpect(xpath("DataElement/groups/groups").nodeCount(3))
-    .andExpect(xpath("DataElement/groups/groups[1]").string(is("group1")))
-    .andExpect(xpath("DataElement/groups/groups[2]").string(is("group2")))
-    .andExpect(xpath("DataElement/groups/groups[3]").string(is("group3")))
-    .andDo(document("find-dataElement"));
+    .andExpect(xpath("DataElement/name").string(is(DISPLAY_NAME)))
+    .andExpect(xpath("DataElement/groups/group").nodeCount(3))
+    .andExpect(xpath("DataElement/groups/group[1]").string(is("group1")))
+    .andExpect(xpath("DataElement/groups/group[2]").string(is("group2")))
+    .andExpect(xpath("DataElement/groups/group[3]").string(is("group3")))
+    .andDo(document("find-dataElement.xml"));
+  }
+  
+  @WithMockUser
+  @Test
+  public void find_xml2_login_ok() throws Exception {
+    
+    mockMvc
+    .perform(get(String.format("/dataElements/%s.xml", ELEMENT_ID)))
+    .andDo(print())
+    .andExpect(content().contentType("application/xml;charset=UTF-8"))
+    .andExpect(status().isOk())
+    .andExpect(xpath("DataElement/id").string(is(ELEMENT_ID)))
+    .andExpect(xpath("DataElement/name").string(is(DISPLAY_NAME)))
+    .andExpect(xpath("DataElement/groups/group").nodeCount(3))
+    .andExpect(xpath("DataElement/groups/group[1]").string(is("group1")))
+    .andExpect(xpath("DataElement/groups/group[2]").string(is("group2")))
+    .andExpect(xpath("DataElement/groups/group[3]").string(is("group3")))
+    .andDo(document("find-dataElement.xml"));
+  }
+  
+  @WithMockUser
+  @Test
+  public void find_xml3_login_ok() throws Exception {
+    
+    mockMvc
+    .perform(get(String.format("/dataElements/%s?mediaType=xml", ELEMENT_ID)))
+    .andDo(print())
+    .andExpect(content().contentType("application/xml;charset=UTF-8"))
+    .andExpect(status().isOk())
+    .andExpect(xpath("DataElement/id").string(is(ELEMENT_ID)))
+    .andExpect(xpath("DataElement/name").string(is(DISPLAY_NAME)))
+    .andExpect(xpath("DataElement/groups/group").nodeCount(3))
+    .andExpect(xpath("DataElement/groups/group[1]").string(is("group1")))
+    .andExpect(xpath("DataElement/groups/group[2]").string(is("group2")))
+    .andExpect(xpath("DataElement/groups/group[3]").string(is("group3")))
+    .andDo(document("find-dataElement.xml"));
   }
   
   @Test
