@@ -50,4 +50,4 @@ You can control the output type through these 3 different controls:
 2. Add the `mediaType` request parameter to the URL, like so: `/dataElementGroups?mediaType=xml`
 3. Accept Header: Add an `Accept` header to your request with `application/xml` or `application/json`
 
-If no out put control is found the return value format will default to JSON.
+If no output control is found the return value format will default to JSON.
