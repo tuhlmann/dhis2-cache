@@ -20,22 +20,22 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MetaFetcher {
   
-  @Autowired
-  private Environment env;
   
   @Autowired
   private DataElementService dataElementService;
 
+  private Environment env;
   private final Dhis2ElementGroupCache groupCache;
   private final Dhis2ElementCache elementCache;
 
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
   private final RestTemplate restTemplate = new RestTemplate();
   
-  MetaFetcher(Dhis2ElementGroupCache groupCache, Dhis2ElementCache elementCache) {
+  MetaFetcher(Dhis2ElementGroupCache groupCache, Dhis2ElementCache elementCache, Environment env) {
     this.groupCache = groupCache;
     this.elementCache = elementCache;
-    restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("admin", "district"));    
+    this.env = env;
+    restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor(env.getProperty("dhis2.username"), env.getProperty("dhis2.password")));    
   }
 
   private String getDataElementGroupsUrl(String host) {
@@ -56,7 +56,7 @@ public class MetaFetcher {
     elementCache.putAll(dataElementService.genDataElements(dataElements));
   }
   
-  @Scheduled(fixedDelayString = "${metaFetcher.fetchEachMs}", initialDelay = 2000)
+  @Scheduled(fixedDelayString = "${metaFetcher.fetchEachMs}", initialDelayString = "${metaFetcher.initialDelay}")
   /**
    * Fetching meta data.
    * In a real app each endpoint should have its own thread so they could fetch and persist in parallel

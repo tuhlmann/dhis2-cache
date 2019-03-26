@@ -23,6 +23,22 @@ Run included tests with:
   ./mvnw test
 ```
 
+The test package also includes integration tests. These use [Wiremock](http://wiremock.org/) to create a backend service from
+which we fetch the source meta data- instead of accessing the real service. Everything else uses the production logic to
+test as much of production code as possible. Using this approach we test:
+
+- authentication at the backend service
+- transmission of data from backend service to our app, parsing and reading this data and caching it
+- accessing our own REST api with a client and fetching data as json and xml
+- testing we got indeed the data we expected.
+
+Integration tests are excluded from these tests, they run with a separate profile:
+
+```
+  ./mvnw verify -Pintegration-tests
+```
+
+
 ### Run
 
 - run directly: `./mvnw clean spring-boot:run`

@@ -1,0 +1,61 @@
+{
+    "dataElementGroups": [
+        {
+            "id": "oDkJh5Ddh7d",
+            "displayName": "Acute Flaccid Paralysis (AFP) ",
+            "dataElements": [
+                {
+                    "id": "HLPuaFB7Frw"
+                },
+                {
+                    "id": "FQ2o8UBlcrS"
+                },
+                {
+                    "id": "jmWyJFtE7Af"
+                },
+                {
+                    "id": "eMyVanycQSC"
+                },
+                {
+                    "id": "P3jJH5Tu5VC"
+                },
+                {
+                    "id": "M62VHgYT2n0"
+                },
+                {
+                    "id": "RUv0hqER0zV"
+                }
+            ]
+        },
+        {
+            "id": "GBHN1a1Jddh",
+            "displayName": "All Others",
+            "dataElements": [
+                {
+                    "id": "qrur9Dvnyt5"
+                }
+            ]
+        },
+        {
+            "id": "KmwPVkjp7yl",
+            "displayName": "Anaemia",
+            "dataElements": [
+                {
+                    "id": "HLPuaFB7Frw"
+                },
+                {
+                    "id": "yqBkn9CWKih"
+                },
+                {
+                    "id": "jmWyJFtE7Af"
+                },
+                {
+                    "id": "eMyVanycQSC"
+                },
+                {
+                    "id": "hCVSHjcml9g"
+                }
+            ]
+        }
+    ]
+}

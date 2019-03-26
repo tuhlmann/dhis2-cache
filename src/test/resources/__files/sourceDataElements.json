@@ -1,0 +1,49 @@
+{
+    "dataElements": [
+        {
+            "id": "FTRrcoaog83",
+            "displayName": "Accute Flaccid Paralysis (Deaths < 5 yrs)",
+            "dataElementGroups": [
+                {
+                    "id": "idD1wcvBISQ"
+                },
+                {
+                    "id": "rPGfUFYbcfJ"
+                },
+                {
+                    "id": "QAc5FhbeFwl"
+                }
+            ]
+        },
+        {
+            "id": "P3jJH5Tu5VC",
+            "displayName": "Acute Flaccid Paralysis (AFP) follow-up",
+            "dataElementGroups": [
+                {
+                    "id": "oDkJh5Ddh7d"
+                },
+                {
+                    "id": "SLsJy3zqUbD"
+                },
+                {
+                    "id": "g50BzGAsrvu"
+                }
+            ]
+        },
+        {
+            "id": "FQ2o8UBlcrS",
+            "displayName": "Acute Flaccid Paralysis (AFP) new",
+            "dataElementGroups": [
+                {
+                    "id": "weRMUzBs8T7"
+                },
+                {
+                    "id": "oDkJh5Ddh7d"
+                },
+                {
+                    "id": "SLsJy3zqUbD"
+                }
+            ]
+        }
+  ]
+}
